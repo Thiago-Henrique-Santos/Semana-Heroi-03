@@ -2,32 +2,32 @@ node_modules
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-frontend/node_modules
-frontend/.pnp
-frontend/.pnp.js
-frontend/.yarn/install-state.gz
+aula01/frontend/node_modules
+aula01/frontend/.pnp
+aula01/frontend/.pnp.js
+aula01/frontend/.yarn/install-state.gz
 
 # testing
-frontend/coverage
+aula01/frontend/coverage
 
 # next.js
-frontend/.next/
-frontend/out/
+aula01/frontend/.next/
+aula01/frontend/out/
 
 # production
-frontend/build
+aula01/frontend/build
 
 # misc
-frontend/.DS_Store
-frontend/*.pem
+aula01/frontend/.DS_Store
+aula01/frontend/*.pem
 
 # debug
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
+aula01/frontend/npm-debug.log*
+aula01/frontend/yarn-debug.log*
+aula01/frontend/yarn-error.log*
 
 # local env files
-frontend/.env*.local
+aula01/frontend/.env*.local
 
 # vercel
 .vercel
