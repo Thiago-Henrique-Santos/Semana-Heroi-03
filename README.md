@@ -11,5 +11,6 @@
 > > Would you like to use `scr` directory? _ No/<u>Yes</u>
 > > Would you like to use App Router? (recommended) _ No/<u>Yes</u>
 > > Would you like to customize the default import alias (@/*) _ <u>No</u>/Yes
+>
 > (Intalando ferramenta svgr como dependência de desenvolvimento)👇
 > > npm install @svgr/cli -D
