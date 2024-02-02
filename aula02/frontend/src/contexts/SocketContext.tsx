@@ -1,5 +1,4 @@
 'use client';
-
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
@@ -13,11 +12,13 @@ export function SocketProvider({children}: {children: ReactNode}) {
     let [socket, setSocket] = useState<Socket>({} as Socket)
 
     useEffect(()=>{
+        console.log(`Estou aqui. Formando uri para o Socket. = ${process.env.NEXT_PUBLIC_API_URL}/streams`);
         const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}/streams`, {
             transports: ['websocket']
         });
         setSocket(newSocket);
     }, []);
+    
     return (
         <SocketContext.Provider value={{socket}}>
             {children}
