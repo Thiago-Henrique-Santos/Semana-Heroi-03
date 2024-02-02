@@ -35,3 +35,35 @@ aula01/frontend/.env*.local
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# aula 02
+
+# dependencies
+aula02/frontend/node_modules
+aula02/frontend/.pnp
+aula02/frontend/.pnp.js
+aula02/frontend/.yarn/install-state.gz
+
+# testing
+aula02/frontend/coverage
+
+# next.js
+aula02/frontend/.next/
+aula02/frontend/out/
+
+# production
+aula02/frontend/build
+
+# misc
+aula02/frontend/.DS_Store
+aula02/frontend/*.pem
+
+# debug
+aula02/frontend/npm-debug.log*
+aula02/frontend/yarn-debug.log*
+aula02/frontend/yarn-error.log*
+
+# local env files
+aula02/frontend/.env*.local
+
+/.next/
