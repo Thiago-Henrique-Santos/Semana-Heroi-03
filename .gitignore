@@ -66,4 +66,34 @@ aula02/frontend/yarn-error.log*
 # local env files
 aula02/frontend/.env*.local
 
+# aula 03
+
+# dependencies
+aula03/frontend/node_modules
+aula03/frontend/.pnp
+aula03/frontend/.pnp.js
+aula03/frontend/.yarn/install-state.gz
+
+# testing
+aula03/frontend/coverage
+
+# next.js
+aula03/frontend/.next/
+aula03/frontend/out/
+
+# production
+aula03/frontend/build
+
+# misc
+aula03/frontend/.DS_Store
+aula03/frontend/*.pem
+
+# debug
+aula03/frontend/npm-debug.log*
+aula03/frontend/yarn-debug.log*
+aula03/frontend/yarn-error.log*
+
+# local env files
+aula03/frontend/.env*.local
+
 /.next/
