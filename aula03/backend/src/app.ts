@@ -57,13 +57,6 @@ class App{
             });
         });
 
-        socket.on('ice candidates', data=>{
-            socket.to(data.to).emit('ice candidates', {
-                candidate: data.candidate,
-                sender: data.sender
-            });
-        })
-
         socket.on('chat', (data)=>{
             console.log("Before broadcast:", data);
             socket.broadcast.to(data.roomId).emit('chat', {
