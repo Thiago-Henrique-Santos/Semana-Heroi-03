@@ -3,43 +3,13 @@ import { Camera, Computer, Mic, NoCamera, NoComputer, NoMic, Phone } from "@/Ico
 import Container from "./Container";
 import { useState } from "react";
 
-export default function Footer({
-        videoMediaStream, 
-        peerConnections
-    }: {
-        videoMediaStream: MediaStream | null; 
-        peerConnections: Record<string, RTCPeerConnection>;
-    }) {
+export default function Footer(){
     const [isMuted, setIsMuted] = useState(false);
     const [isCameraOff, setIsCameraOff] = useState(false);
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const date = new Date();
     const hours = date.getHours().toString().padStart(2, '0') + ':';
     const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    const toggleMuted = () => {
-        setIsMuted(!isMuted);
-        videoMediaStream?.getAudioTracks().forEach((track)=>{
-            track.enabled = isMuted;
-        });
-    }
-
-    const toggleCamera = () => {
-        setIsCameraOff(!isCameraOff);
-        videoMediaStream?.getVideoTracks().forEach((track)=>{
-            track.enabled = isCameraOff;
-        });
-
-        Object.values(peerConnections).forEach((peerConnections)=>{
-            console.log(peerConnections.getSenders());
-            peerConnections.getSenders().forEach((sender)=>{
-                if(sender.track?.kind == 'video') {
-                    sender.track.enabled = !isCameraOff;
-                }
-            });
-        });
-    }
-
     return (
         <div className="fixed items-center bottom-0 bg-black py-6 w-full">
             <Container>
@@ -51,14 +21,14 @@ export default function Footer({
                     </div>
                     <div className="flex space-x-6 justify-center">
                         {isMuted ? (
-                            <NoMic className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>toggleMuted()}/>
+                            <NoMic className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>setIsMuted(!isMuted)}/>
                         ) : (
-                            <Mic className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>toggleMuted()}/>
+                            <Mic className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>setIsMuted(!isMuted)}/>
                         )}
                         {isCameraOff ? (
-                            <NoCamera className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>toggleCamera()}/>
+                            <NoCamera className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>setIsCameraOff(!isCameraOff)}/>
                         ) : (
-                            <Camera className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>toggleCamera()}/>
+                            <Camera className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>setIsCameraOff(!isCameraOff)}/>
                         )}
                         {isScreenSharing ? (
                             <NoComputer className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>setIsScreenSharing(!isScreenSharing)}/>
