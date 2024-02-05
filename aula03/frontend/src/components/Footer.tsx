@@ -3,7 +3,13 @@ import { Camera, Computer, Mic, NoCamera, NoComputer, NoMic, Phone } from "@/Ico
 import Container from "./Container";
 import { useState } from "react";
 
-export default function Footer({videoMediaStream}: {videoMediaStream: MediaStream | null}){
+export default function Footer({
+        videoMediaStream, 
+        peerConnections
+    }: {
+        videoMediaStream: MediaStream | null; 
+        peerConnections: Record<string, RTCPeerConnection>;
+    }) {
     const [isMuted, setIsMuted] = useState(false);
     const [isCameraOff, setIsCameraOff] = useState(false);
     const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -22,6 +28,15 @@ export default function Footer({videoMediaStream}: {videoMediaStream: MediaStrea
         setIsCameraOff(!isCameraOff);
         videoMediaStream?.getVideoTracks().forEach((track)=>{
             track.enabled = isCameraOff;
+        });
+
+        Object.values(peerConnections).forEach((peerConnections)=>{
+            console.log(peerConnections.getSenders());
+            peerConnections.getSenders().forEach((sender)=>{
+                if(sender.track?.kind == 'video') {
+                    sender.track.enabled = !isCameraOff;
+                }
+            });
         });
     }
 
