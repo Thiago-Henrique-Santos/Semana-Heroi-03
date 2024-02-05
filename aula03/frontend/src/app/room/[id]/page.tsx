@@ -40,7 +40,7 @@ export default function Room({params}: {params: {id: string}}){
                 <div className="md:w-[85%] w-full m-5">
                     <div className="grid md:grid-cols-2 grid-cols-1 gap-2">
                         <div className="bg-gray-950 w-[85%] rounded-md h-[85%] p-2 relative">
-                            <video className="h-full w-full" autoPlay ref={localStream}/>
+                            <video className="h-full w-full mirror-mode" autoPlay ref={localStream}/>
                             <span className="absolute bottom-3">Thiago Santos</span>
                         </div>
                         <div className="bg-gray-950 w-[85%] rounded-md h-[85%] p-2 relative">
