@@ -27,19 +27,44 @@ class App{
 
     private socketEvents(socket: Socket) {
         console.log(`Socket connected: ${socket.id}`);
+
         socket.on('subscribe', (data) => {
             console.log(`Usuário entrou na sala: ${data.roomId}`);
             socket.join(data.roomId);
+            socket.join(data.socketId);
 
-            socket.on('chat', (data)=>{
-                console.log("Before broadcast:", data);
-                socket.broadcast.to(data.roomId).emit('chat', {
-                    message: data.message,
-                    username: data.username,
-                    time: data.time
+            const roomSession = Array.from(socket.rooms);
+
+            if (roomSession.length > 1) {
+                socket.to(data.roomId).emit('new user', {
+                    socketId: socket.id,
+                    username: data.username
                 });
+            }
+        });
+
+        socket.on('newUserStart', data=>{
+            console.log('Novo usuário chegou. ', data);
+            socket.to(data.to).emit('newUserStart', {
+                sender: data.sender
             });
-        })
+        });
+
+        socket.on('sdp', data=>{
+            socket.to(data.to).emit('sdp', {
+                description: data.description,
+                sender: data.sender
+            });
+        });
+
+        socket.on('chat', (data)=>{
+            console.log("Before broadcast:", data);
+            socket.broadcast.to(data.roomId).emit('chat', {
+                message: data.message,
+                username: data.username,
+                time: data.time
+            });
+        });
     }
 }
 
