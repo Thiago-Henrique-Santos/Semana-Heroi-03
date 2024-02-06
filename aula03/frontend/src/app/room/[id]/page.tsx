@@ -20,9 +20,18 @@ export default function Room({params}: {params: {id: string}}){
             await  initCamera();
         });
 
+        socket?.on('newUserStart', (data)=>{
+            console.log('Usuário conectado na sala!', data);
+        });
+
         socket?.on('new user', (data)=>{
             console.log('Usuário novo conectado!', data);
             createPeerConnection(data.socketId);
+
+            socket.emit('newUserStart', {
+                to: data.socketId,
+                sender: socket.id
+            });
         });
     }, [socket, params]);
 
