@@ -9,6 +9,7 @@ export default function Room({params}: {params: {id: string}}){
     const {socket} = useContext(SocketContext);
     const localStream = useRef<HTMLVideoElement>(null);
     const peerConnections = useRef<Record<string, RTCPeerConnection>>({});
+    console.log("🚀 ~ Room ~ peerConnections:", peerConnections.current)
 
     useEffect(()=>{
         socket?.on('connect', async ()=>{
@@ -22,20 +23,25 @@ export default function Room({params}: {params: {id: string}}){
 
         socket?.on('newUserStart', (data)=>{
             console.log('Usuário conectado na sala!', data);
+            createPeerConnection(data.sender, true);
         });
 
         socket?.on('new user', (data)=>{
             console.log('Usuário novo conectado!', data);
-            createPeerConnection(data.socketId);
+            createPeerConnection(data.socketId, false);
 
             socket.emit('newUserStart', {
                 to: data.socketId,
                 sender: socket.id
             });
         });
+
+        socket?.on('sdp', data=>{
+            console.log('Oferta recebida!', data);
+        });
     }, [socket, params]);
 
-    const createPeerConnection = (socketId: string) => {
+    const createPeerConnection = async (socketId: string, createOffer: boolean) => {
         const config = {
             iceServers: [
                 {
@@ -46,6 +52,19 @@ export default function Room({params}: {params: {id: string}}){
 
         const peer = new RTCPeerConnection(config);
         peerConnections.current[socketId] = peer;
+
+        if (createOffer) {
+            const peerConnection = peerConnections.current[socketId];
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            socket?.emit('sdp', {
+                to: socketId,
+                sender: socket?.id,
+                description: peerConnection.localDescription
+            });
+        }
     }
 
     const initCamera = async () => {
