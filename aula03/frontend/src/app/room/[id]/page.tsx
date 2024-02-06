@@ -18,6 +18,10 @@ export default function Room({params}: {params: {id: string}}){
             });
             await  initCamera();
         });
+
+        socket?.on('new user', (data)=>{
+            console.log('Usuário novo conectado!', data);
+        });
     }, [socket, params]);
 
     const initCamera = async () => {
