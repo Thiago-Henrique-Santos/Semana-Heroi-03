@@ -19,7 +19,9 @@ export default function Room({params}: {params: {id: string}}){
     const {socket} = useContext(SocketContext);
     const localStream = useRef<HTMLVideoElement>(null);
     const peerConnections = useRef<Record<string, RTCPeerConnection>>({});
-    const [remoteStream, setRemoteStream] = useState<MediaStream[]>([]);
+    const [remoteStreams, setRemoteStreams] = useState<MediaStream[]>([]);
+    const [videoMediaStream, setVideoMediaStream] = useState<MediaStream | null>(null);
+    console.log("🚀 ~ Room ~ remoteStream:", remoteStreams)
 
     useEffect(()=>{
         socket?.on('connect', async ()=>{
@@ -28,7 +30,7 @@ export default function Room({params}: {params: {id: string}}){
                 roomId: params.id,
                 socketId: socket.id
             });
-            await  initCamera();
+            await  initLocalCamera();
         });
 
         socket?.on('new user', (data)=>{
@@ -95,6 +97,15 @@ export default function Room({params}: {params: {id: string}}){
         peerConnections.current[socketId] = peer;
         const peerConnection = peerConnections.current[socketId];
 
+        if (videoMediaStream) {
+            videoMediaStream.getTracks().forEach((track)=>{
+                peerConnection.addTrack(track, videoMediaStream);
+            });
+        } else {
+            const video = await initRemoteCamera();
+            video.getTracks().forEach((track)=>peerConnection.addTrack(track, video));
+        }
+
         if (createOffer) {
             const peerConnection = peerConnections.current[socketId];
 
@@ -113,7 +124,12 @@ export default function Room({params}: {params: {id: string}}){
         peerConnection.ontrack = (event) => {
             const remoteStream = event.streams[0];
 
-            setRemoteStream(remoteStream);
+            // const dataStream = {
+            //     id: socketId,
+            //     stream: remoteStream
+            // }
+
+            setRemoteStreams([...remoteStreams, remoteStream]);
         }
 
         peer.onicecandidate = (event) => {
@@ -127,7 +143,7 @@ export default function Room({params}: {params: {id: string}}){
         }
     }
 
-    const initCamera = async () => {
+    const initLocalCamera = async () => {
         const video = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: {
@@ -136,8 +152,19 @@ export default function Room({params}: {params: {id: string}}){
             }
         });
 
-        if (localStream.current)
-            localStream.current.srcObject = video;
+        setVideoMediaStream(video);
+        if (localStream.current) localStream.current.srcObject = video;
+    }
+
+    const initRemoteCamera = async () => {
+        const video = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: {
+                noiseSuppression: true,
+                echoCancellation: true
+            }
+        });
+        return video;
     }
 
     return (
@@ -150,18 +177,16 @@ export default function Room({params}: {params: {id: string}}){
                             <video className="h-full w-full mirror-mode" autoPlay ref={localStream}/>
                             <span className="absolute bottom-3">Thiago Santos</span>
                         </div>
-                        <div className="bg-gray-950 w-[85%] rounded-md h-[85%] p-2 relative">
-                            <video className="h-full w-full"></video>
-                            <span className="absolute bottom-3">Matheus Santos</span>
-                        </div>
-                        <div className="bg-gray-950 w-[85%] rounded-md h-[85%] p-2 relative">
-                            <video className="h-full w-full"></video>
-                            <span className="absolute bottom-3">Yuri Souza</span>
-                        </div>
-                        <div className="bg-gray-950 w-[85%] rounded-md h-[85%] p-2 relative">
-                            <video className="h-full w-full"></video>
-                            <span className="absolute bottom-3">Pedro Lemos</span>
-                        </div>
+                        {remoteStreams.map((stream, index)=>{
+                            return (
+                                <div className="bg-gray-950 w-[85%] rounded-md h-[85%] p-2 relative" key={index}>
+                                    <video className="h-full w-full" autoPlay ref={(video)=>{
+                                        if (video && video.srcObject != stream) video.srcObject = stream;
+                                    }}></video>
+                                    <span className="absolute bottom-3">Matheus Santos</span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
                 <Chat roomId={params.id}/>
