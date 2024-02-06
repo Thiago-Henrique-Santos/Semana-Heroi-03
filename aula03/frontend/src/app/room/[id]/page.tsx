@@ -3,7 +3,7 @@ import Chat from "@/components/Chat";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { SocketContext } from "@/contexts/SocketContext";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 interface IAnswer {
     sender: string;
@@ -19,6 +19,7 @@ export default function Room({params}: {params: {id: string}}){
     const {socket} = useContext(SocketContext);
     const localStream = useRef<HTMLVideoElement>(null);
     const peerConnections = useRef<Record<string, RTCPeerConnection>>({});
+    const [remoteStream, setRemoteStream] = useState<MediaStream[]>([]);
 
     useEffect(()=>{
         socket?.on('connect', async ()=>{
@@ -107,6 +108,12 @@ export default function Room({params}: {params: {id: string}}){
                 sender: socket?.id,
                 description: peerConnection.localDescription
             });
+        }
+
+        peerConnection.ontrack = (event) => {
+            const remoteStream = event.streams[0];
+
+            setRemoteStream(remoteStream);
         }
 
         peer.onicecandidate = (event) => {
