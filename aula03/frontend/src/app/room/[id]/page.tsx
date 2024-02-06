@@ -10,6 +10,11 @@ interface IAnswer {
     description: RTCSessionDescriptionInit;
 }
 
+interface ICandidates {
+    candidate: RTCIceCandidate;
+    sender: string;
+}
+
 export default function Room({params}: {params: {id: string}}){
     const {socket} = useContext(SocketContext);
     const localStream = useRef<HTMLVideoElement>(null);
@@ -41,7 +46,17 @@ export default function Room({params}: {params: {id: string}}){
         });
 
         socket?.on('sdp', (data)=>handleAnswer(data));
+
+        socket?.on('ice candidates', (data) => handleIceCandidates(data));
     }, [socket, params]);
+
+    const handleIceCandidates = async (data: ICandidates) => {
+        const peerConnection = peerConnections.current[data.sender];
+
+        if (data.candidate) {
+            await peerConnection.addIceCandidate(new RTCIceCandidate (data.candidate));
+        }
+    }
 
     const handleAnswer = async (data: IAnswer) => {
         const peerConnection = peerConnections.current[data.sender];
@@ -77,6 +92,7 @@ export default function Room({params}: {params: {id: string}}){
 
         const peer = new RTCPeerConnection(config);
         peerConnections.current[socketId] = peer;
+        const peerConnection = peerConnections.current[socketId];
 
         if (createOffer) {
             const peerConnection = peerConnections.current[socketId];
@@ -91,6 +107,16 @@ export default function Room({params}: {params: {id: string}}){
                 sender: socket?.id,
                 description: peerConnection.localDescription
             });
+        }
+
+        peer.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket?.emit('ice candidates', {
+                    to: socketId,
+                    sender: socket?.id,
+                    candidate: event.candidate
+                });
+            }
         }
     }
 
