@@ -58,6 +58,11 @@ export default function Room({params}: {params: {id: string}}){
                 sender: socket?.id,
                 description: peerConnection.localDescription
             });
+        } else if (data.description.type == 'answer') {
+            console.log('Ouvindo a resposta.');
+            await peerConnection.setRemoteDescription(
+                new RTCSessionDescription(data.description)
+            );
         }
     }
 
