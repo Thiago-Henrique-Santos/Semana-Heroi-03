@@ -191,7 +191,7 @@ export default function Room({params}: {params: {id: string}}){
                 </div>
                 <Chat roomId={params.id}/>
             </div>
-            <Footer/>
+            <Footer videoMediaStream={videoMediaStream}/>
         </div>
     );
 }
