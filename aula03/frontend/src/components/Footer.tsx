@@ -1,14 +1,16 @@
 'use client';
 import { Camera, Computer, Mic, NoCamera, NoComputer, NoMic, Phone } from "@/Icons";
 import Container from "./Container";
-import { useState } from "react";
+import { MutableRefObject, useState } from "react";
 
 export default function Footer({
     videoMediaStream, 
-    peerConnections
+    peerConnections,
+    localStream
     }: {
         videoMediaStream: MediaStream | null;
         peerConnections: Record<string, RTCPeerConnection>;
+        localStream: MutableRefObject<HTMLVideoElement | null>;
     }){
     const [isMuted, setIsMuted] = useState(false);
     const [isCameraOff, setIsCameraOff] = useState(false);
@@ -52,6 +54,8 @@ export default function Footer({
             video: true,
             audio: true
         });
+
+        if(localStream.current) localStream.current.srcObject = videoShareScreen;
 
         Object.values(peerConnections.current).forEach((peerConnection)=>{
             peerConnection.getSenders().forEach((sender)=>{
