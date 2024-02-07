@@ -47,6 +47,23 @@ export default function Footer({
         });
     }
 
+    const toggleScreenSharing = async ()=>{
+        const videoShareScreen = await navigator.mediaDevices.getDisplayMedia({
+            video: true,
+            audio: true
+        });
+
+        Object.values(peerConnections.current).forEach((peerConnection)=>{
+            peerConnection.getSenders().forEach((sender)=>{
+                if(sender.track?.kind == 'video'){
+                    sender.replaceTrack(videoShareScreen.getVideoTracks()[0]);
+                }
+            });
+        });
+
+        setIsScreenSharing(!isScreenSharing)
+    }
+
     return (
         <div className="fixed items-center bottom-0 bg-black py-6 w-full">
             <Container>
@@ -68,9 +85,9 @@ export default function Footer({
                             <Camera className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>toggleVideo()}/>
                         )}
                         {isScreenSharing ? (
-                            <NoComputer className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>setIsScreenSharing(!isScreenSharing)}/>
+                            <NoComputer className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>toggleScreenSharing()}/>
                         ) : (
-                            <Computer className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>setIsScreenSharing(!isScreenSharing)}/>
+                            <Computer className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>toggleScreenSharing()}/>
                         )}
                         <Phone className="h-12 w-16 text-white hover:bg-red-500 p-2 cursor-pointer bg-primary rounded-md"/>
                     </div>
