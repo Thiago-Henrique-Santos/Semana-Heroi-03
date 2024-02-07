@@ -6,11 +6,13 @@ import { MutableRefObject, useState } from "react";
 export default function Footer({
     videoMediaStream, 
     peerConnections,
-    localStream
+    localStream,
+    logout
     }: {
         videoMediaStream: MediaStream;
         peerConnections: MutableRefObject<Record<string, RTCPeerConnection>>;
         localStream: MutableRefObject<HTMLVideoElement | null>;
+        logout: ()=>void;
     }){
     const [isMuted, setIsMuted] = useState(false);
     const [isCameraOff, setIsCameraOff] = useState(false);
@@ -117,7 +119,7 @@ export default function Footer({
                         ) : (
                             <Computer className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>toggleScreenSharing()}/>
                         )}
-                        <Phone className="h-12 w-16 text-white hover:bg-red-500 p-2 cursor-pointer bg-primary rounded-md"/>
+                        <Phone onClick={logout} className="h-12 w-16 text-white hover:bg-red-500 p-2 cursor-pointer bg-primary rounded-md"/>
                     </div>
                 </div>
             </Container>

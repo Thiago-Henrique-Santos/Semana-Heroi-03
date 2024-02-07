@@ -3,6 +3,7 @@ import Chat from "@/components/Chat";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { SocketContext } from "@/contexts/SocketContext";
+import { useRouter } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
 
 interface IAnswer {
@@ -18,6 +19,7 @@ interface ICandidates {
 export default function Room({params}: {params: {id: string}}){
     const {socket} = useContext(SocketContext);
     const localStream = useRef<HTMLVideoElement>(null);
+    const router = useRouter();
     const peerConnections = useRef<Record<string, RTCPeerConnection>>({});
     const [remoteStreams, setRemoteStreams] = useState<MediaStream[]>([]);
     const [videoMediaStream, setVideoMediaStream] = useState<MediaStream | null>(null);
@@ -143,6 +145,19 @@ export default function Room({params}: {params: {id: string}}){
         }
     }
 
+    const logout = ()=>{
+        videoMediaStream?.getTracks().forEach((track)=>{
+            track.stop();
+        });
+
+        Object.values(peerConnections.current).forEach((peerConnection)=>{
+            peerConnection.close();
+        });
+
+        socket?.disconnect();
+        router.push('/');
+    }
+
     const initLocalCamera = async () => {
         const video = await navigator.mediaDevices.getUserMedia({
             video: true,
@@ -191,7 +206,12 @@ export default function Room({params}: {params: {id: string}}){
                 </div>
                 <Chat roomId={params.id}/>
             </div>
-            <Footer videoMediaStream={videoMediaStream!} peerConnections={peerConnections} localStream={localStream}/>
+            <Footer 
+                videoMediaStream={videoMediaStream!} 
+                peerConnections={peerConnections} 
+                localStream={localStream}
+                logout={logout}
+            />
         </div>
     );
 }
