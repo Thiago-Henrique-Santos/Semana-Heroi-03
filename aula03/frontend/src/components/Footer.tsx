@@ -50,22 +50,36 @@ export default function Footer({
     }
 
     const toggleScreenSharing = async ()=>{
-        const videoShareScreen = await navigator.mediaDevices.getDisplayMedia({
-            video: true,
-            audio: true
-        });
+        if(!isScreenSharing) {
+            const videoShareScreen = await navigator.mediaDevices.getDisplayMedia({
+                video: true,
+                audio: true
+            });
+    
+            if(localStream.current) localStream.current.srcObject = videoShareScreen;
+    
+            Object.values(peerConnections.current).forEach((peerConnection)=>{
+                peerConnection.getSenders().forEach((sender)=>{
+                    if(sender.track?.kind == 'video'){
+                        sender.replaceTrack(videoShareScreen.getVideoTracks()[0]);
+                    }
+                });
+            });
+    
+            setIsScreenSharing(!isScreenSharing);
+            return;
+        }
 
-        if(localStream.current) localStream.current.srcObject = videoShareScreen;
+        if(localStream.current) localStream.current.srcObject = videoMediaStream;
 
         Object.values(peerConnections.current).forEach((peerConnection)=>{
             peerConnection.getSenders().forEach((sender)=>{
                 if(sender.track?.kind == 'video'){
-                    sender.replaceTrack(videoShareScreen.getVideoTracks()[0]);
+                    sender.replaceTrack(videoMediaStream?.getVideoTracks()[0]);
                 }
             });
         });
-
-        setIsScreenSharing(!isScreenSharing)
+        setIsScreenSharing(!isScreenSharing);
     }
 
     return (
