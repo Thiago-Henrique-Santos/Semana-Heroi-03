@@ -126,12 +126,15 @@ export default function Room({params}: {params: {id: string}}){
         peerConnection.ontrack = (event) => {
             const remoteStream = event.streams[0];
 
-            // const dataStream = {
-            //     id: socketId,
-            //     stream: remoteStream
-            // }
+            const dataStream = {
+                id: socketId,
+                stream: remoteStream
+            }
 
-            setRemoteStreams([...remoteStreams, remoteStream]);
+            setRemoteStreams(
+                (prevState: MediaStream[])=>
+                    [...prevState, dataStream] as MediaStream[]
+                );
         }
 
         peer.onicecandidate = (event) => {
@@ -141,6 +144,16 @@ export default function Room({params}: {params: {id: string}}){
                     sender: socket?.id,
                     candidate: event.candidate
                 });
+            }
+        }
+
+        peerConnection.onsignalingstatechange = (event) => {
+            switch (peerConnection.signalingState) {
+                case 'closed':
+                    setRemoteStreams((prevState)=>
+                        prevState.filter((stream)=>stream.id != socketId)
+                    );
+                    break;
             }
         }
     }
