@@ -22,6 +22,14 @@ export default function Footer({
         videoMediaStream?.getAudioTracks().forEach((track)=>{
             track.enabled = isMuted;
         });
+
+        Object.values(peerConnections.current).forEach((peerConnection)=>{
+            peerConnection.getSenders().forEach((sender)=>{
+                if(sender.track?.kind == 'audio'){
+                    sender.replaceTrack(videoMediaStream?.getAudioTracks().find((track)=>track.kind=='audio'));
+                }
+            });
+        });
     }
 
     const toggleVideo = ()=>{
@@ -30,12 +38,9 @@ export default function Footer({
             track.enabled = isCameraOff;
         });
 
-        console.log('Alterando estado do video!');
         Object.values(peerConnections.current).forEach((peerConnection)=>{
-            console.log('Entrando na conexão para alterar o estado para a outra pessoa.', peerConnection);
             peerConnection.getSenders().forEach((sender)=>{
                 if(sender.track?.kind == 'video'){
-                    console.log('Alterando o da outra pessoa, também.');
                     sender.replaceTrack(videoMediaStream?.getVideoTracks().find((track)=>track.kind=='video'));
                 }
             });
