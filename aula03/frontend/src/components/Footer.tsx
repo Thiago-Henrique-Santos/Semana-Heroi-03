@@ -18,6 +18,13 @@ export default function Footer({videoMediaStream}: {videoMediaStream: MediaStrea
         });
     }
 
+    const toggleVideo = ()=>{
+        setIsCameraOff(!isCameraOff);
+        videoMediaStream?.getVideoTracks().forEach((track)=>{
+            track.enabled = isCameraOff;
+        });
+    }
+
     return (
         <div className="fixed items-center bottom-0 bg-black py-6 w-full">
             <Container>
@@ -34,9 +41,9 @@ export default function Footer({videoMediaStream}: {videoMediaStream: MediaStrea
                             <Mic className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>toggleMuted()}/>
                         )}
                         {isCameraOff ? (
-                            <NoCamera className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>setIsCameraOff(!isCameraOff)}/>
+                            <NoCamera className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>toggleVideo()}/>
                         ) : (
-                            <Camera className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>setIsCameraOff(!isCameraOff)}/>
+                            <Camera className="h-12 w-16 text-white p-2 cursor-pointer bg-gray-950 rounded-md" onClick={()=>toggleVideo()}/>
                         )}
                         {isScreenSharing ? (
                             <NoComputer className="h-12 w-16 text-white p-2 cursor-pointer bg-red-500 rounded-md" onClick={()=>setIsScreenSharing(!isScreenSharing)}/>
