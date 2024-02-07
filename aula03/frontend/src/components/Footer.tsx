@@ -31,12 +31,12 @@ export default function Footer({
         });
 
         console.log('Alterando estado do video!');
-        Object.values(peerConnections).forEach((peerConnection)=>{
+        Object.values(peerConnections.current).forEach((peerConnection)=>{
             console.log('Entrando na conexão para alterar o estado para a outra pessoa.', peerConnection);
             peerConnection.getSenders().forEach((sender)=>{
                 if(sender.track?.kind == 'video'){
                     console.log('Alterando o da outra pessoa, também.');
-                    sender.track.enabled = isCameraOff;
+                    sender.replaceTrack(videoMediaStream?.getVideoTracks().find((track)=>track.kind=='video'));
                 }
             });
         });
