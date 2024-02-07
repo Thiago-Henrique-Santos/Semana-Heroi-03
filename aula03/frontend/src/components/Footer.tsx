@@ -8,8 +8,8 @@ export default function Footer({
     peerConnections,
     localStream
     }: {
-        videoMediaStream: MediaStream | null;
-        peerConnections: Record<string, RTCPeerConnection>;
+        videoMediaStream: MediaStream;
+        peerConnections: MutableRefObject<Record<string, RTCPeerConnection>>;
         localStream: MutableRefObject<HTMLVideoElement | null>;
     }){
     const [isMuted, setIsMuted] = useState(false);
@@ -27,8 +27,14 @@ export default function Footer({
 
         Object.values(peerConnections.current).forEach((peerConnection)=>{
             peerConnection.getSenders().forEach((sender)=>{
-                if(sender.track?.kind == 'audio'){
-                    sender.replaceTrack(videoMediaStream?.getAudioTracks().find((track)=>track.kind=='audio'));
+                if (videoMediaStream?.getAudioTracks().length > 0){
+                    if(sender.track?.kind == 'audio'){
+                        sender.replaceTrack(
+                            videoMediaStream
+                                ?.getAudioTracks()
+                                .find((track)=>track.kind=='audio') || null
+                        );
+                    }
                 }
             });
         });
@@ -43,7 +49,11 @@ export default function Footer({
         Object.values(peerConnections.current).forEach((peerConnection)=>{
             peerConnection.getSenders().forEach((sender)=>{
                 if(sender.track?.kind == 'video'){
-                    sender.replaceTrack(videoMediaStream?.getVideoTracks().find((track)=>track.kind=='video'));
+                    sender.replaceTrack(
+                        videoMediaStream
+                            ?.getVideoTracks()
+                            .find((track)=>track.kind=='video') || null
+                    );
                 }
             });
         });
