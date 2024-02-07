@@ -16,12 +16,17 @@ interface ICandidates {
     sender: string;
 }
 
+interface IDataStream {
+    id: string;
+    stream: MediaStream;
+}
+
 export default function Room({params}: {params: {id: string}}){
     const {socket} = useContext(SocketContext);
     const localStream = useRef<HTMLVideoElement>(null);
     const router = useRouter();
     const peerConnections = useRef<Record<string, RTCPeerConnection>>({});
-    const [remoteStreams, setRemoteStreams] = useState<MediaStream[]>([]);
+    const [remoteStreams, setRemoteStreams] = useState<IDataStream[]>([]);
     const [videoMediaStream, setVideoMediaStream] = useState<MediaStream | null>(null);
     console.log("🚀 ~ Room ~ remoteStream:", remoteStreams)
 
@@ -126,15 +131,18 @@ export default function Room({params}: {params: {id: string}}){
         peerConnection.ontrack = (event) => {
             const remoteStream = event.streams[0];
 
-            const dataStream = {
+            const dataStream: IDataStream = {
                 id: socketId,
                 stream: remoteStream
             }
 
             setRemoteStreams(
-                (prevState: MediaStream[])=>
-                    [...prevState, dataStream] as MediaStream[]
-                );
+                (prevState: IDataStream[])=>{
+                    if(!prevState.some(stream=>stream.id == socketId)){
+                        return [...prevState, dataStream];
+                    }
+                    return prevState;
+                });
         }
 
         peer.onicecandidate = (event) => {
@@ -152,6 +160,23 @@ export default function Room({params}: {params: {id: string}}){
                 case 'closed':
                     setRemoteStreams((prevState)=>
                         prevState.filter((stream)=>stream.id != socketId)
+                    );
+                    break;
+            }
+        }
+        peerConnection.onconnectionstatechange = (event) => {
+            switch(peerConnection.connectionState){
+                case 'disconnected':
+                    setRemoteStreams((prevState)=>
+                        prevState.filter((stream)=>stream.id!=socketId)
+                    );
+                case 'failed':
+                    setRemoteStreams((prevState)=>
+                        prevState.filter((stream)=>stream.id!=socketId)
+                    );
+                case 'closed':
+                    setRemoteStreams((prevState)=>
+                        prevState.filter((stream)=>stream.id!=socketId)
                     );
                     break;
             }
@@ -209,7 +234,7 @@ export default function Room({params}: {params: {id: string}}){
                             return (
                                 <div className="bg-gray-950 w-[85%] rounded-md h-[85%] p-2 relative" key={index}>
                                     <video className="h-full w-full" autoPlay ref={(video)=>{
-                                        if (video && video.srcObject != stream) video.srcObject = stream;
+                                        if (video && video.srcObject != stream.stream) video.srcObject = stream.stream;
                                     }}></video>
                                     <span className="absolute bottom-3">Matheus Santos</span>
                                 </div>
