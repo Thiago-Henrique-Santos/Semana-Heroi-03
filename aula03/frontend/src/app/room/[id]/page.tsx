@@ -236,7 +236,7 @@ export default function Room({params}: {params: {id: string}}){
                                     <video className="h-full w-full" autoPlay ref={(video)=>{
                                         if (video && video.srcObject != stream.stream) video.srcObject = stream.stream;
                                     }}></video>
-                                    <span className="absolute bottom-3">Matheus Santos</span>
+                                    <span className="absolute bottom-3">Thiago Santos</span>
                                 </div>
                             );
                         })}
